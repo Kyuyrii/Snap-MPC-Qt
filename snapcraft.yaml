@@ -34,6 +34,7 @@ apps:
     extensions: [kde-neon-6]
     environment:
       QT_QPA_PLATFORMTHEME: xdgdesktopportal
+      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$PYTHONPATH
       LD_LIBRARY_PATH: $SNAP/lxqt-support/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$LD_LIBRARY_PATH
       QT_PLUGIN_PATH: $SNAP/lxqt-support/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/qt6/plugins:$QT_PLUGIN_PATH
     plugs:
@@ -65,27 +66,40 @@ package-repositories:
     components: [main]
     architectures: [amd64, arm64]
     key-id: 444DABCF3667D0283F894EDDE6D4736255751E5D
+  - type: apt
+    url: https://ppa.launchpadcontent.net/ubuntuhandbook1/mpv/ubuntu
+    suites: [noble]
+    components: [main]
+    architectures: [amd64, arm64]
+    key-id: F4E48910A020E77056748B745738AE8480447DDF
+  - type: apt
+    url: https://ppa.launchpadcontent.net/tomtomtom/yt-dlp/ubuntu
+    suites: [noble]
+    components: [main]
+    architectures: [amd64, arm64]
+    key-id: CEC312CC5ED8215A6E0EFC49B90E9186F0E836FB
 
 parts:
-  mpc-qt-player:
+  mpc-qt-app:
     plugin: cmake
     source: https://github.com/mpc-qt/mpc-qt.git
     source-tag: v$SNAPCRAFT_PROJECT_VERSION
     build-packages:
       - libmpv-dev
       - libboost-dev
+      - libproxy-dev
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DMPCQT_VERSION=25.07-Snap-NyKyu
     override-build: |
       craftctl default
-      sed -i 's|Name=Media Player Classic Qute Theater|Name=MPC-QT [NyKyu]|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
+      sed -i 's|Name=Media Player Classic Qute Theater|Name=MPC-Qt [NyKyu]|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
       sed -i 's|Exec=mpc-qt %U|Exec=${SNAP}/usr/bin/mpc-qt %U|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
       sed -i 's|TryExec=mpc-qt|TryExec=${SNAP}/usr/bin/mpc-qt|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
       sed -i 's|Icon=mpc-qt|Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/mpc-qt.svg|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
 
   dependencies:
-    after: [mpc-qt-player]
+    after: [mpc-qt-app]
     plugin: nil
     stage-packages:
       - libsdl2-2.0-0
@@ -116,39 +130,22 @@ parts:
       - libvidstab1.1
       - libzimg2
       - libzix-0-0
-    prime:
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libSDL2-2.0.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libXpresent.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libXv.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libavdevice.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libavfilter.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libbs2b.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libcdio.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libcdio_cdda.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libcdio_paranoia.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libdecor-0.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libfftw3.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite_cmu_us_awb.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite_cmu_us_kal.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite_cmu_us_kal16.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite_cmu_us_rms.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite_cmu_us_slt.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite_cmulex.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libflite_usenglish.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libjack.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/liblilv-0.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libmpv.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libmujs.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libplacebo.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libpocketsphinx.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/librubberband.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libserd-0.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libsixel.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libsord-0.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libsphinxbase.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libsratom-0.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libuchardet.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libvidstab.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libzimg.so*
-      - usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libzix-0.so*
+      - yt-dlp
+
+  cleanup:
+    after: [mpc-qt-app, dependencies]
+    plugin: nil
+    build-snaps:
+      - mesa-2404
+      - kf6-core24
+    override-prime: |
+      set -eux
+      cd /snap/mesa-2404/current/usr/lib
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/lib/{} \;
+      cd /snap/mesa-2404/current/usr/share
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/share/{} \;
+
+      cd /snap/kf6-core24/current/usr/lib
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/lib/{} \;
+      cd /snap/kf6-core24/current/usr/share
+      find . -type f,l -exec rm -f $CRAFT_PRIME/usr/share/{} \;
