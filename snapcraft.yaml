@@ -1,6 +1,6 @@
 name: mpc-qt
 base: core24
-version: '25.07'
+version: '26.01'
 platforms:
   amd64:
     build-on: [amd64]
@@ -25,6 +25,7 @@ description: |
 
 grade: stable
 confinement: strict
+icon: mpc-qt.svg
 
 apps:
   mpc-qt:
@@ -90,13 +91,10 @@ parts:
       - libproxy-dev
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
-      - -DMPCQT_VERSION=25.07-Snap-NyKyu
+      - -DMPCQT_VERSION=$SNAPCRAFT_PROJECT_VERSION-Snap-NyKyu
     override-build: |
       craftctl default
       sed -i 's|Name=Media Player Classic Qute Theater|Name=MPC-Qt [NyKyu]|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
-      sed -i 's|Exec=mpc-qt %U|Exec=${SNAP}/usr/bin/mpc-qt %U|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
-      sed -i 's|TryExec=mpc-qt|TryExec=${SNAP}/usr/bin/mpc-qt|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
-      sed -i 's|Icon=mpc-qt|Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/mpc-qt.svg|' $CRAFT_PART_INSTALL/usr/share/applications/io.github.mpc_qt.mpc-qt.desktop
 
   dependencies:
     after: [mpc-qt-app]
